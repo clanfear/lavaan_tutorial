@@ -1,0 +1,451 @@
+<style>
+.small-code pre code {
+  font-size: 15pt;
+}
+
+code {
+   background-color: #efefef;
+   font-weight:bold;
+}
+</style>
+
+Structural Equation Models in R with lavaan
+========================================================
+author: Charles Lanfear
+date: April 12th, 2018
+width: 1600
+height: 900
+font-family: Helvetica
+
+R and RStudio
+========================================================
+incremental: true
+
+R is a programming language built for statistical computing.
+
+If one already knows MPlus, LISREL, or similar software, why use R for SEM?
+
+* R is free, so you don't need a terminal server.
+* R has a very large community that provides support.
+* R can handle virtually any data format.
+* R is makes replication easy, particularly with RStudio.
+* R is a language so it can do *everything*.
+* R is a good stepping stone to other languages like Python.
+
+lavaan
+========================================================
+incremental: true
+
+`lavaan`, short for latent variable analysis, is an R package that...
+
+* Handles general structural equation models
+* Uses *much* simpler syntax than Lisrel and MPlus
+* Has a large range of estimators and options
+* Easily fits into a reproducible R workflow
+
+Installing 
+========================================================
+
+We'll be using two packages in these examples: `lavaan` and `semPlot`
+
+If you do not have these installed, install them as you would any other packages:
+
+```{r, eval=FALSE}
+install.packages("lavaan")
+install.packages("semPlot")
+```
+
+Then load with `library()`
+
+```{r}
+library(lavaan)
+library(semPlot)
+```
+
+Example Data
+========================================================
+
+We will be using the example data built into `lavaan` to explore its syntax and output.
+
+```{r}
+data(HolzingerSwineford1939)
+```
+
+These data are commonly used in SEM examples in textbooks and articles. For more information you can enter `?HolzingerSwineford1939` in the console to open the description file for the dataset.
+
+lavaan Syntax: Operators
+========================================================
+incremental: true
+
+`lavaan` uses a simplified syntax using three primary operators:
+
+* `~` for regressions
+* `~=~` for latent variables
+* `~~` for variances and covariances
+
+Every model will be specified with *strings of text* containing some combination of these three operators.
+
+lavaan Functions
+========================================================
+incremental: true
+
+`lavaan` uses three primary functions for estimating models:
+
+* `cfa()` for Confirmatory Factor Analysis
+* `sem()` for Structural Equation Models
+* `lavaan()` for *all* models.
+
+These functions actually only differ by their *default arguments*. You can see what these defaults are by getting help on each function (e.g. `?cfa`).
+
+I typicaly use `sem()` for everything because I am used to its defaults and am normally estimating conventional structural equation models.
+
+lavaan Syntax: Linear regression
+========================================================
+
+Most or all of you are probably familiar with specifying a linear regression in R:
+
+```{r lm_1}
+lm_out_1 <- lm(x4 ~ ageyr, data=HolzingerSwineford1939)
+```
+
+We can specify a simple linear regression in lavaan similarly
+
+```{r sem_lm}
+sem_out_1 <- sem('x4 ~ ageyr', data=HolzingerSwineford1939)
+```
+
+Note the formulas for `lavaan` calls are *in quotes*: `lavaan` requires text input, which it converts into individual equations internally.
+
+lavaan Output: Linear regression
+========================================================
+class: small-code
+
+```{r}
+summary(lm_out_1)
+```
+
+***
+
+```{r}
+summary(sem_out_1)
+```
+
+lavaan Syntax: CFA
+========================================================
+
+Normally we would only use `lavaan` if we are interested in multiple equations. For more complex models, we will want to create a `lavaan` formula as a separate object before sending it to a `lavaan` function.
+
+Here is syntax for three-factor CFA / latent variable model:
+
+```{r cfa_1}
+cfa_mod_1 <- '
+   visual  =~ x1 + x2 + x3
+   textual =~ x4 + x5 + x6
+   speed   =~ x7 + x8 + x9
+'
+cfa_out_1 <- cfa(cfa_mod_1, data=HolzingerSwineford1939)
+```
+
+Here we have defined three latent (unobserved) variables, `visual`, `textual`, and `speed`, each with three observed indicators.
+
+lavaan Output: CFA
+========================================================
+class: small-code
+incremental: true
+
+```{r cfa_2}
+summary(cfa_out_1)
+```
+
+***
+
+`lavaan` produces a lot of output once you give it more complex models!
+
+When using the `cfa()` or `sem()` functions, `lavaan`...
+
+* Automatically sets the first indicator coefficient to `1`
+* Estimates covariances between latent variables
+* Estimates variances for all latent and observed variables
+* Defaults to a Maximum-Likelihood estimator.
+
+You can also use `parameterEstimates()` to extract `lavaan` estimates as a data frame, similar to `tidy()` in the `broom`.
+
+This is good if you want to create nice results tables or plot estimates using `ggplot2`.
+
+lavaan parameterEstimates()
+========================================================
+class: small-code
+
+```{r}
+parameterEstimates(cfa_out_1)
+```
+
+semPlot Output
+========================================================
+
+We can get a simple diagram of our CFA using `semPaths()` in the `semPlot` package.
+
+```{r semPlot_1, echo=TRUE, eval=FALSE}
+semPaths(cfa_out_1, whatLabels = "est")
+```
+
+```{r semPlot_1_actual, fig.dim=c(28,9), out.width='1400px', out.height='450px', echo=FALSE}
+semPaths(cfa_out_1, whatLabels = "est", mar=c(5,2,8,2), edge.label.cex=.9)
+```
+
+lavaan Syntax: Walking dog
+========================================================
+
+The walking dog model is a common SEM example. It features two latent variables, each with two indicators, and a regression between them.
+
+```{r walking_dog_1}
+wd_mod_1 <- '
+   X =~ x1 + x2
+   Y =~ x4 + x5
+   Y ~ X
+'
+wd_out_1 <- sem(wd_mod_1, data=HolzingerSwineford1939)
+```
+
+lavaan Output: Walking dog
+========================================================
+class: small-code
+
+```{r walking_dog_2}
+summary(wd_out_1)
+```
+
+semPlot Output: Walking dog
+========================================================
+
+```{r semPlot_2, echo=TRUE, eval=FALSE}
+library(semPlot)
+semPaths(wd_out_1, whatLabels = "est")
+```
+
+```{r semPlot_2_actual, fig.dim=c(12,12), out.width='600px', out.height='600px', echo=FALSE}
+library(semPlot)
+semPaths(wd_out_1, whatLabels = "est", mar=c(2,2,2,2), edge.label.cex=1.1) 
+```
+
+lavaan Syntax: Fixing coefficients
+========================================================
+
+Often when estimating a model, we want to fix particular coefficients to a certain value. We can do this in `lavaan` using pre-multiplication.
+
+```{r walking_dog_3}
+wd_mod_2 <- '
+   X =~ 1*x1 + 1*x2
+   Y =~ 1*x4 + 1*x5
+   Y ~ X
+'
+wd_out_2 <- sem(wd_mod_2, data=HolzingerSwineford1939)
+```
+
+lavaan Output: Fixed coefficients
+========================================================
+class: small-code
+
+```{r walking_dog_4}
+summary(wd_out_2)
+```
+
+lavaan Syntax: Equality constraints
+========================================================
+
+We can use similar syntax to fix constrain coefficients to be the same value, which is still estimated.
+
+In this case, I am forcing the coefficients on the second indicators to have the same coefficient.
+
+```{r walking_dog_5}
+wd_mod_3 <- '
+   X =~ x1 + b1*x2
+   Y =~ x4 + b1*x5
+   Y ~ X
+'
+wd_out_3 <- sem(wd_mod_3, data=HolzingerSwineford1939)
+```
+
+This is sometimes a necessary constraint for identification!
+
+lavaan Output: Equality constraints
+========================================================
+class: small-code
+
+```{r walking_dog_6}
+summary(wd_out_3)
+```
+
+lavaan Syntax: Fixing covariances
+========================================================
+
+We can also constrain covariances to `0` with the same basic syntax.
+
+```{r cfa_3}
+cfa_mod_2 <- '
+   visual  =~ x1 + x2 + x3
+   textual =~ x4 + x5 + x6
+   speed   =~ x7 + x8 + x9
+   
+   visual ~~ 0*textual
+   visual ~~ 0*speed
+'
+cfa_out_2 <- cfa(cfa_mod_2, data=HolzingerSwineford1939)
+```
+
+Here we have made the assumption that the `visual` latent construct is **orthogonal** to `textual` and `speed`.
+
+lavaan Output: Fixed covariances
+========================================================
+class: small-code
+
+```{r cfa_4}
+summary(cfa_out_2)
+```
+
+semPlot Output: Fixed covariances
+========================================================
+
+```{r semPlot_3, echo=TRUE, eval=FALSE}
+semPaths(cfa_out_2, whatLabels = "est")
+```
+
+```{r semPlot_3_actual, fig.dim=c(28,9), out.width='1400px', out.height='450px', echo=FALSE}
+semPaths(cfa_out_2, whatLabels = "est", mar=c(5,2,8,2), edge.label.cex=.9)
+```
+
+lavaan Syntax: Complex models
+========================================================
+
+We can put multiple latent variables, regressions, and covariances together to build complex models.
+
+Here is a three factor mediation model. `visual` is dependent on `textual` and `speed` but the effect of `speed` is also mediated by `textual`.
+
+```{r}
+complex_mod_1 <- '
+   visual  =~ x1 + x2 + x3
+   textual =~ x4 + x5 + x6
+   speed   =~ x7 + x8 + x9
+   
+   visual  ~ textual + speed
+   textual ~ speed
+'
+complex_out_1 <- sem(complex_mod_1, data=HolzingerSwineford1939)
+```
+
+
+lavaan Output: Complex model
+========================================================
+class: small-code
+
+```{r}
+parameterEstimates(complex_out_1)
+```
+
+semPlot Output: Complex model
+========================================================
+
+```{r semPlot_5, echo=TRUE, eval=FALSE}
+semPaths(complex_out_1, whatLabels = "est")
+```
+
+```{r semPlot_5_actual, fig.dim=c(28,12), out.width='1400px', out.height='600px', echo=FALSE}
+semPaths(complex_out_1, whatLabels = "est", mar=c(5,2,8,2), edge.label.cex=.9)
+```
+
+Other lavaan Features
+========================================================
+
+`lavaan` is highly customizable and contains many features useful for fitting complex structural equations.
+
+Three examples you may find useful:
+
+* Alternate **estimators**
+* Proper treatment of **categorical variables**
+* Input using **covariance matrices**
+* **Additional arguments** for specifying models
+
+Feature: Alternate estimators
+========================================================
+
+`lavaan` defaults to using a full-information Maximum-Likelihood (ML) Estimator. This is the most efficient estimator available and can handle missing data.
+
+We may want to specify alternate estimators if our data do not meet the assumptions for ML.
+
+By adding the `estimator=` argument to our `cfa()`, `sem()`, or `lavaan()` call, we can choose another estimator.
+
+Some useful choices:
+
+* `estimator="MLM"`: ML with robust errors and Satorra-Bentler test statistic.
+* `estimator="WLSMV"`: Weighted least squares with mean and variance adjusted test statistic (needed for categorical endogenous variables).
+
+Example `sem()` call:
+
+```
+sem(complex_mod_1, data=HolzingerSwineford1939, estimator="MLM")
+```
+
+Feature: Categorical variables
+========================================================
+
+If you provide `lavaan` categorical data as an endogenous variable, it will automatically use
+a proper estimator (e.g. Diagonally Weighted Least Squares).
+
+To specify an ordinal variable as categorical, you will want to make it an *ordered factor*:
+
+Base R syntax:
+```
+data$cat_var <- ordered(data$cat_var)
+```
+
+`dplyr` syntax:
+```
+data <- data %>% mutate(cat_var=ordered(cat_var))
+```
+
+Unordered categorical variables (factors) will need to be split into dummy variables prior to estimation.
+
+Feature: Covariance matrix input
+========================================================
+
+Like LISREL, `lavaan` also accepts inputting data as a raw covariance matrix.
+
+Here is example syntax from the `lavaan` tutorial page using the lower half of a covariance matrix combined with the `getCov()` function to create a full covariance matrix with variable names. Note the use of `sample.cov=` and `sample.nobs=` arguments to `sem()` instead of `data=`.
+
+```
+lower <- '
+ 11.834
+  6.947   9.364
+  6.819   5.091  12.532
+  4.783   5.028   7.495   9.986
+ -3.839  -3.889  -3.841  -3.625  9.610
+-21.899 -18.831 -21.748 -18.775 35.522 450.288 '
+
+wheaton.cov <- 
+    getCov(lower, names = c("anomia67", "powerless67", "anomia71", 
+                            "powerless71", "education", "sei"))
+
+fit <- sem(wheaton.model, sample.cov = wheaton.cov, sample.nobs = 932)
+```
+
+Feature: Additional arguments
+========================================================
+
+Most of the time you will be fine with `lavaan`'s default settings. 
+
+However, there are many, many arguments you can give to `sem()`, `cfa()`, or `lavaan()` to adjust how models are estimated.
+
+To see these arguments, view the help files using `?lavaan` and `?lavOptions`.
+
+Getting Help
+========================================================
+
+Because `lavaan` is a complex package and structural equation models are a deep field in statistics, you are likely to run into issues eventually (or constantly).
+
+You can find a more detailed `lavaan` tutorial and a number of resources via the [official `lavaan` website](http://lavaan.ugent.be/).
+
+For troubleshooting, the [`lavaan` Google group](https://groups.google.com/forum/#!forum/lavaan) is very active and frequented by the package authors.
+
+`lavaan` is in constant development, so you may want to check the [GitHub repository](https://github.com/yrosseel/lavaan) for current issues or new features.
+
+If you need a new feature or bug fix from the development version, you can install it using `install_github()` in the `devtools` package.
