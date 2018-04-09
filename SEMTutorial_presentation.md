@@ -17,6 +17,14 @@ width: 1600
 height: 900
 font-family: Helvetica
 
+This Presentation
+========================================================
+
+All files, including source code, for this presentation can be found on my [GitHub at https://github.com/clanfear/lavaan_tutorial/](https://github.com/clanfear/lavaan_tutorial/)
+
+If you wish, you may download these files and follow along using either the `.Rpres` or `.R` files.
+
+
 R and RStudio
 ========================================================
 incremental: true
@@ -29,16 +37,15 @@ If one already knows MPlus, LISREL, or similar software, why use R for SEM?
 * R has a very large community that provides support.
 * R can handle virtually any data format.
 * R is makes replication easy, particularly with RStudio.
-* R is a language so it can do *everything*.
-* R is a good stepping stone to other languages like Python.
+* R is a programming *language* so it can do *everything*.
 
 lavaan
 ========================================================
 incremental: true
 
-`lavaan`, short for latent variable analysis, is an R package that...
+`lavaan`, short for *latent variable analysis*, is an R package that...
 
-* Handles general structural equation models
+* Handles general structural equation modeling
 * Uses *much* simpler syntax than Lisrel and MPlus
 * Has a large range of estimators and options
 * Easily fits into a reproducible R workflow
@@ -400,7 +407,6 @@ semPlot Output: Walking dog
 
 
 ```r
-library(semPlot)
 semPaths(wd_out_1, whatLabels = "est")
 ```
 
