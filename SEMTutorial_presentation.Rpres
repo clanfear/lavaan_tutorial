@@ -87,7 +87,7 @@ incremental: true
 `lavaan` uses a simplified syntax using three primary operators:
 
 * `~` for regressions
-* `~=~` for latent variables
+* `=~` for latent variables
 * `~~` for variances and covariances
 
 Every model will be specified with *strings of text* containing some combination of these three operators.
@@ -121,6 +121,8 @@ We can specify a simple linear regression in lavaan similarly
 sem_out_1 <- sem('x4 ~ ageyr', data=HolzingerSwineford1939)
 ```
 
+This indicates that `x4` is regressed on `ageyr`; the dependent variable goes on the left of `~` and independent variables on the right.
+
 Note the formulas for `lavaan` calls are *in quotes*: `lavaan` requires text input, which it converts into individual equations internally.
 
 lavaan Output: Linear regression
@@ -152,6 +154,8 @@ cfa_mod_1 <- '
 '
 cfa_out_1 <- cfa(cfa_mod_1, data=HolzingerSwineford1939)
 ```
+
+For latent variables, we give a name for the construct on the left of `=~` and indicators on the right.
 
 Here we have defined three latent (unobserved) variables, `visual`, `textual`, and `speed`, each with three observed indicators.
 
@@ -292,11 +296,12 @@ cfa_mod_2 <- '
    textual =~ x4 + x5 + x6
    speed   =~ x7 + x8 + x9
    
-   visual ~~ 0*textual
-   visual ~~ 0*speed
+   visual  ~~ 0*textual + 0*speed
 '
 cfa_out_2 <- cfa(cfa_mod_2, data=HolzingerSwineford1939)
 ```
+
+For covariances, you can have only one variable left of `~~` but multiple on the right.
 
 Here we have made the assumption that the `visual` latent construct is **orthogonal** to `textual` and `speed`.
 

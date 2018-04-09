@@ -874,7 +874,7 @@ library(semPlot)
 
 <ul>
 <li class="fragment"><code>~</code> for regressions</li>
-<li class="fragment"><code>~=~</code> for latent variables</li>
+<li class="fragment"><code>=~</code> for latent variables</li>
 <li class="fragment"><code>~~</code> for variances and covariances</li>
 </ul>
 
@@ -913,6 +913,8 @@ library(semPlot)
 
 <pre><code class="r">sem_out_1 &lt;- sem(&#39;x4 ~ ageyr&#39;, data=HolzingerSwineford1939)
 </code></pre>
+
+<p>This indicates that <code>x4</code> is regressed on <code>ageyr</code>; the dependent variable goes on the left of <code>~</code> and independent variables on the right.</p>
 
 <p>Note the formulas for <code>lavaan</code> calls are <em>in quotes</em>: <code>lavaan</code> requires text input, which it converts into individual equations internally.</p>
 
@@ -995,6 +997,8 @@ Variances:
 &#39;
 cfa_out_1 &lt;- cfa(cfa_mod_1, data=HolzingerSwineford1939)
 </code></pre>
+
+<p>For latent variables, we give a name for the construct on the left of <code>=~</code> and indicators on the right.</p>
 
 <p>Here we have defined three latent (unobserved) variables, <code>visual</code>, <code>textual</code>, and <code>speed</code>, each with three observed indicators.</p>
 
@@ -1351,11 +1355,12 @@ Variances:
    textual =~ x4 + x5 + x6
    speed   =~ x7 + x8 + x9
 
-   visual ~~ 0*textual
-   visual ~~ 0*speed
+   visual  ~~ 0*textual + 0*speed
 &#39;
 cfa_out_2 &lt;- cfa(cfa_mod_2, data=HolzingerSwineford1939)
 </code></pre>
+
+<p>For covariances, you can have only one variable left of <code>~~</code> but multiple on the right.</p>
 
 <p>Here we have made the assumption that the <code>visual</code> latent construct is <strong>orthogonal</strong> to <code>textual</code> and <code>speed</code>.</p>
 
