@@ -2,10 +2,9 @@
 .small-code pre code {
   font-size: 15pt;
 }
-
 code {
    background-color: #efefef;
-   font-weight:bold;
+   font-weight: bold;
 }
 </style>
 
@@ -20,9 +19,11 @@ font-family: Helvetica
 This Presentation
 ========================================================
 
-All files, including source code, for this presentation can be found on my [GitHub at https://github.com/clanfear/lavaan_tutorial/](https://github.com/clanfear/lavaan_tutorial/)
+All files for this presentation---including source code---can be found on my [GitHub at https://github.com/clanfear/lavaan_tutorial/](https://github.com/clanfear/lavaan_tutorial/)
 
-If you wish, you may download these files and follow along using either the `.Rpres` or `.R` files.
+The presentation itself is hosted at [http://clanfear.github.io/lavaan_tutorial/lavaan_tutorial_presentation.html](http://clanfear.github.io/lavaan_tutorial/lavaan_tutorial_presentation.html).
+
+If you wish to follow along in R / RStudio, you may download these files and use either the `.Rpres` or `.R` files.
 
 
 R and RStudio
@@ -36,7 +37,7 @@ If one already knows MPlus, LISREL, or similar software, why use R for SEM?
 * R is free, so you don't need a terminal server.
 * R has a very large community that provides support.
 * R can handle virtually any data format.
-* R is makes replication easy, particularly with RStudio.
+* R makes replication easy, particularly with RStudio.
 * R is a programming *language* so it can do *everything*.
 
 lavaan
@@ -109,6 +110,8 @@ These functions actually only differ by their *default arguments*. You can see w
 
 I typicaly use `sem()` for everything because I am used to its defaults and am normally estimating conventional structural equation models.
 
+At the time of this presentation, `sem()` and `cfa()` have the same default arguments, though this may change as `lavaan` development continues.
+
 lavaan Syntax: Linear regression
 ========================================================
 
@@ -119,7 +122,7 @@ Most or all of you are probably familiar with specifying a linear regression in 
 lm_out_1 <- lm(x4 ~ ageyr, data=HolzingerSwineford1939)
 ```
 
-We can specify a simple linear regression in lavaan similarly
+We can specify a simple linear regression in `lavaan` similarly
 
 
 ```r
@@ -168,7 +171,7 @@ summary(sem_out_1)
 ```
 
 ```
-lavaan (0.6-1.1207) converged normally after   9 iterations
+lavaan (0.6-1.1209) converged normally after   9 iterations
 
   Number of observations                           301
 
@@ -191,6 +194,28 @@ Variances:
                    Estimate  Std.Err  z-value  P(>|z|)
    .x4                1.298    0.106   12.268    0.000
 ```
+
+Multiple Regression
+========================================================
+
+We can specify multiple regression models by just adding additional covariates on the right side of formulae.
+
+In `lm()`:
+
+
+```r
+lm_out_2 <- lm(x4 ~ ageyr + sex + grade, 
+               data=HolzingerSwineford1939)
+```
+
+In `sem()`:
+
+
+```r
+sem_out_2 <- sem('x4 ~ ageyr + sex + grade', 
+                 data=HolzingerSwineford1939)
+```
+
 
 lavaan Syntax: CFA
 ========================================================
@@ -224,7 +249,7 @@ summary(cfa_out_1)
 ```
 
 ```
-lavaan (0.6-1.1207) converged normally after  35 iterations
+lavaan (0.6-1.1209) converged normally after  35 iterations
 
   Number of observations                           301
 
@@ -289,7 +314,7 @@ When using the `cfa()` or `sem()` functions, `lavaan`...
 * Estimates variances for all latent and observed variables
 * Defaults to a Maximum-Likelihood estimator.
 
-You can also use `parameterEstimates()` to extract `lavaan` estimates as a data frame, similar to `tidy()` in the `broom`.
+You can also use `parameterEstimates()` to extract `lavaan` estimates as a data frame, similar to `tidy()` in the `broom` package.
 
 This is good if you want to create nice results tables or plot estimates using `ggplot2`.
 
@@ -340,7 +365,22 @@ We can get a simple diagram of our CFA using `semPaths()` in the `semPlot` packa
 semPaths(cfa_out_1, whatLabels = "est")
 ```
 
-<img src="SEMTutorial_presentation-figure/semPlot_1_actual-1.png" title="plot of chunk semPlot_1_actual" alt="plot of chunk semPlot_1_actual" width="1400px" height="450px" />
+<img src="lavaan_tutorial_presentation-figure/semPlot_1_actual-1.png" title="plot of chunk semPlot_1_actual" alt="plot of chunk semPlot_1_actual" width="1400px" height="450px" />
+
+
+lavaanPlot
+========================================================
+There is also a recent package specifically for plotting `lavaan` models called `lavaanPlot`. It produces plots using `diagrammeR` rather than the R graphics subsystem, but is a bit light on features right now.
+
+
+```r
+library(lavaanPlot)
+lavaanPlot(model=cfa_out_1, covs=TRUE, stand=FALSE)
+```
+
+
+
+<iframe src="demo.html" style="position:absolute;height:100%;width:100%"></iframe>
 
 lavaan Syntax: Walking dog
 ========================================================
@@ -367,7 +407,7 @@ summary(wd_out_1)
 ```
 
 ```
-lavaan (0.6-1.1207) converged normally after  32 iterations
+lavaan (0.6-1.1209) converged normally after  32 iterations
 
   Number of observations                           301
 
@@ -414,7 +454,7 @@ semPlot Output: Walking dog
 semPaths(wd_out_1, whatLabels = "est")
 ```
 
-<img src="SEMTutorial_presentation-figure/semPlot_2_actual-1.png" title="plot of chunk semPlot_2_actual" alt="plot of chunk semPlot_2_actual" width="600px" height="600px" />
+<img src="lavaan_tutorial_presentation-figure/semPlot_2_actual-1.png" title="plot of chunk semPlot_2_actual" alt="plot of chunk semPlot_2_actual" width="600px" height="600px" />
 
 lavaan Syntax: Fixing coefficients
 ========================================================
@@ -441,7 +481,7 @@ summary(wd_out_2)
 ```
 
 ```
-lavaan (0.6-1.1207) converged normally after  20 iterations
+lavaan (0.6-1.1209) converged normally after  20 iterations
 
   Number of observations                           301
 
@@ -483,9 +523,9 @@ Variances:
 lavaan Syntax: Equality constraints
 ========================================================
 
-We can use similar syntax to fix constrain coefficients to be the same value, which is still estimated.
+We can use similar syntax to constrain coefficients to be the same value, which is still estimated.
 
-In this case, I am forcing the coefficients on the second indicators to have the same coefficient.
+In this case, I am forcing the coefficients on the second indicators to have the same value (`b1`).
 
 
 ```r
@@ -509,7 +549,7 @@ summary(wd_out_3)
 ```
 
 ```
-lavaan (0.6-1.1207) converged normally after  29 iterations
+lavaan (0.6-1.1209) converged normally after  29 iterations
 
   Number of observations                           301
 
@@ -579,7 +619,7 @@ summary(cfa_out_2)
 ```
 
 ```
-lavaan (0.6-1.1207) converged normally after  33 iterations
+lavaan (0.6-1.1209) converged normally after  33 iterations
 
   Number of observations                           301
 
@@ -641,14 +681,17 @@ semPlot Output: Fixed covariances
 semPaths(cfa_out_2, whatLabels = "est")
 ```
 
-<img src="SEMTutorial_presentation-figure/semPlot_3_actual-1.png" title="plot of chunk semPlot_3_actual" alt="plot of chunk semPlot_3_actual" width="1400px" height="450px" />
+<img src="lavaan_tutorial_presentation-figure/semPlot_3_actual-1.png" title="plot of chunk semPlot_3_actual" alt="plot of chunk semPlot_3_actual" width="1400px" height="450px" />
 
 lavaan Syntax: Complex models
 ========================================================
 
 We can put multiple latent variables, regressions, and covariances together to build complex models.
 
-Here is a three factor mediation model. `visual` is dependent on `textual` and `speed` but the effect of `speed` is also mediated by `textual`.
+Here is a three factor mediation model:
+
+* `visual` is dependent on `textual` and `speed`
+* The effect of `speed` on `visual` is partially mediated by `textual`.
 
 
 ```r
@@ -709,14 +752,14 @@ semPlot Output: Complex model
 semPaths(complex_out_1, whatLabels = "est")
 ```
 
-<img src="SEMTutorial_presentation-figure/semPlot_5_actual-1.png" title="plot of chunk semPlot_5_actual" alt="plot of chunk semPlot_5_actual" width="1400px" height="600px" />
+<img src="lavaan_tutorial_presentation-figure/semPlot_5_actual-1.png" title="plot of chunk semPlot_5_actual" alt="plot of chunk semPlot_5_actual" width="1400px" height="600px" />
 
 Other lavaan Features
 ========================================================
 
 `lavaan` is highly customizable and contains many features useful for fitting complex structural equations.
 
-Three examples you may find useful:
+Examples you may find useful:
 
 * Alternate **estimators**
 * Proper treatment of **categorical variables**
@@ -726,7 +769,7 @@ Three examples you may find useful:
 Feature: Alternate estimators
 ========================================================
 
-`lavaan` defaults to using a full-information Maximum-Likelihood (ML) Estimator. This is the most efficient estimator available and can handle missing data.
+`lavaan` defaults to using a full-information Maximum-Likelihood (ML) Estimator. This is the most efficient estimator available and can handle missing data (`missing=ml`).
 
 We may want to specify alternate estimators if our data do not meet the assumptions for ML.
 
@@ -785,6 +828,9 @@ wheaton.cov <-
 
 fit <- sem(wheaton.model, sample.cov = wheaton.cov, sample.nobs = 932)
 ```
+
+Note the model itself is not shown above.
+
 
 Feature: Additional arguments
 ========================================================

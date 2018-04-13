@@ -794,9 +794,11 @@ hljs.initHighlightingOnLoad();
 <section data-transition="linear" data-transition-speed="default">
 <h3>This Presentation</h3>
 <div class="slideContent" >
-<p>All files, including source code, for this presentation can be found on my <a href="https://github.com/clanfear/lavaan_tutorial/">GitHub at https://github.com/clanfear/lavaan_tutorial/</a></p>
+<p>All files for this presentation&mdash;including source code&mdash;can be found on my <a href="https://github.com/clanfear/lavaan_tutorial/">GitHub at https://github.com/clanfear/lavaan_tutorial/</a></p>
 
-<p>If you wish, you may download these files and follow along using either the <code>.Rpres</code> or <code>.R</code> files.</p>
+<p>The presentation itself is hosted at <a href="http://clanfear.github.io/lavaan_tutorial/lavaan_tutorial_presentation.html">http://clanfear.github.io/lavaan_tutorial/lavaan_tutorial_presentation.html</a>.</p>
+
+<p>If you wish to follow along in R / RStudio, you may download these files and use either the <code>.Rpres</code> or <code>.R</code> files.</p>
 
 </div>
 
@@ -812,7 +814,7 @@ hljs.initHighlightingOnLoad();
 <li class="fragment">R is free, so you don&#39;t need a terminal server.</li>
 <li class="fragment">R has a very large community that provides support.</li>
 <li class="fragment">R can handle virtually any data format.</li>
-<li class="fragment">R is makes replication easy, particularly with RStudio.</li>
+<li class="fragment">R makes replication easy, particularly with RStudio.</li>
 <li class="fragment">R is a programming <em>language</em> so it can do <em>everything</em>.</li>
 </ul>
 
@@ -898,6 +900,8 @@ library(semPlot)
 
 <p class="fragment">I typicaly use <code>sem()</code> for everything because I am used to its defaults and am normally estimating conventional structural equation models.</p>
 
+<p class="fragment">At the time of this presentation, <code>sem()</code> and <code>cfa()</code> have the same default arguments, though this may change as <code>lavaan</code> development continues.</p>
+
 </div>
 
 </section>
@@ -956,7 +960,7 @@ F-statistic: 12.19 on 1 and 299 DF,  p-value: 0.0005527
 <pre><code class="r">summary(sem_out_1)
 </code></pre>
 
-<pre><code>lavaan (0.6-1.1207) converged normally after   9 iterations
+<pre><code>lavaan (0.6-1.1209) converged normally after   9 iterations
 
   Number of observations                           301
 
@@ -978,6 +982,26 @@ Regressions:
 Variances:
                    Estimate  Std.Err  z-value  P(&gt;|z|)
    .x4                1.298    0.106   12.268    0.000
+</code></pre>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>Multiple Regression</h3>
+<div class="slideContent" >
+<p>We can specify multiple regression models by just adding additional covariates on the right side of formulae.</p>
+
+<p>In <code>lm()</code>:</p>
+
+<pre><code class="r">lm_out_2 &lt;- lm(x4 ~ ageyr + sex + grade, 
+               data=HolzingerSwineford1939)
+</code></pre>
+
+<p>In <code>sem()</code>:</p>
+
+<pre><code class="r">sem_out_2 &lt;- sem(&#39;x4 ~ ageyr + sex + grade&#39;, 
+                 data=HolzingerSwineford1939)
 </code></pre>
 
 </div>
@@ -1011,7 +1035,7 @@ cfa_out_1 &lt;- cfa(cfa_mod_1, data=HolzingerSwineford1939)
 <pre class="fragment"><code class="r">summary(cfa_out_1)
 </code></pre>
 
-<pre class="fragment"><code>lavaan (0.6-1.1207) converged normally after  35 iterations
+<pre class="fragment"><code>lavaan (0.6-1.1209) converged normally after  35 iterations
 
   Number of observations                           301
 
@@ -1082,7 +1106,7 @@ Variances:
 <li class="fragment">Defaults to a Maximum-Likelihood estimator.</li>
 </ul>
 
-<p class="fragment">You can also use <code>parameterEstimates()</code> to extract <code>lavaan</code> estimates as a data frame, similar to <code>tidy()</code> in the <code>broom</code>.</p>
+<p class="fragment">You can also use <code>parameterEstimates()</code> to extract <code>lavaan</code> estimates as a data frame, similar to <code>tidy()</code> in the <code>broom</code> package.</p>
 
 <p class="fragment">This is good if you want to create nice results tables or plot estimates using <code>ggplot2</code>.</p>
 
@@ -1139,6 +1163,20 @@ Variances:
 
 </section>
 <section data-transition="linear" data-transition-speed="default">
+<h3>lavaanPlot</h3>
+<div class="slideContent" >
+<p>There is also a recent package specifically for plotting <code>lavaan</code> models called <code>lavaanPlot</code>. It produces plots using <code>diagrammeR</code> rather than the R graphics subsystem, but is a bit light on features right now.</p>
+
+<pre><code class="r">library(lavaanPlot)
+lavaanPlot(model=cfa_out_1, covs=TRUE, stand=FALSE)
+</code></pre>
+
+<iframe src="demo.html" style="position:absolute;height:100%;width:100%"></iframe>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
 <h3>lavaan Syntax: Walking dog</h3>
 <div class="slideContent" >
 <p>The walking dog model is a common SEM example. It features two latent variables, each with two indicators, and a regression between them.</p>
@@ -1160,7 +1198,7 @@ wd_out_1 &lt;- sem(wd_mod_1, data=HolzingerSwineford1939)
 <pre><code class="r">summary(wd_out_1)
 </code></pre>
 
-<pre><code>lavaan (0.6-1.1207) converged normally after  32 iterations
+<pre><code>lavaan (0.6-1.1209) converged normally after  32 iterations
 
   Number of observations                           301
 
@@ -1235,7 +1273,7 @@ wd_out_2 &lt;- sem(wd_mod_2, data=HolzingerSwineford1939)
 <pre><code class="r">summary(wd_out_2)
 </code></pre>
 
-<pre><code>lavaan (0.6-1.1207) converged normally after  20 iterations
+<pre><code>lavaan (0.6-1.1209) converged normally after  20 iterations
 
   Number of observations                           301
 
@@ -1280,9 +1318,9 @@ Variances:
 <section data-transition="linear" data-transition-speed="default">
 <h3>lavaan Syntax: Equality constraints</h3>
 <div class="slideContent" >
-<p>We can use similar syntax to fix constrain coefficients to be the same value, which is still estimated.</p>
+<p>We can use similar syntax to constrain coefficients to be the same value, which is still estimated.</p>
 
-<p>In this case, I am forcing the coefficients on the second indicators to have the same coefficient.</p>
+<p>In this case, I am forcing the coefficients on the second indicators to have the same value (<code>b1</code>).</p>
 
 <pre><code class="r">wd_mod_3 &lt;- &#39;
    X =~ x1 + b1*x2
@@ -1303,7 +1341,7 @@ wd_out_3 &lt;- sem(wd_mod_3, data=HolzingerSwineford1939)
 <pre><code class="r">summary(wd_out_3)
 </code></pre>
 
-<pre><code>lavaan (0.6-1.1207) converged normally after  29 iterations
+<pre><code>lavaan (0.6-1.1209) converged normally after  29 iterations
 
   Number of observations                           301
 
@@ -1373,7 +1411,7 @@ cfa_out_2 &lt;- cfa(cfa_mod_2, data=HolzingerSwineford1939)
 <pre><code class="r">summary(cfa_out_2)
 </code></pre>
 
-<pre><code>lavaan (0.6-1.1207) converged normally after  33 iterations
+<pre><code>lavaan (0.6-1.1209) converged normally after  33 iterations
 
   Number of observations                           301
 
@@ -1446,7 +1484,12 @@ Variances:
 <div class="slideContent" >
 <p>We can put multiple latent variables, regressions, and covariances together to build complex models.</p>
 
-<p>Here is a three factor mediation model. <code>visual</code> is dependent on <code>textual</code> and <code>speed</code> but the effect of <code>speed</code> is also mediated by <code>textual</code>.</p>
+<p>Here is a three factor mediation model:</p>
+
+<ul>
+<li><code>visual</code> is dependent on <code>textual</code> and <code>speed</code></li>
+<li>The effect of <code>speed</code> on <code>visual</code> is partially mediated by <code>textual</code>.</li>
+</ul>
 
 <pre><code class="r">complex_mod_1 &lt;- &#39;
    visual  =~ x1 + x2 + x3
@@ -1514,7 +1557,7 @@ complex_out_1 &lt;- sem(complex_mod_1, data=HolzingerSwineford1939)
 <div class="slideContent" >
 <p><code>lavaan</code> is highly customizable and contains many features useful for fitting complex structural equations.</p>
 
-<p>Three examples you may find useful:</p>
+<p>Examples you may find useful:</p>
 
 <ul>
 <li>Alternate <strong>estimators</strong></li>
@@ -1529,7 +1572,7 @@ complex_out_1 &lt;- sem(complex_mod_1, data=HolzingerSwineford1939)
 <section data-transition="linear" data-transition-speed="default">
 <h3>Feature: Alternate estimators</h3>
 <div class="slideContent" >
-<p><code>lavaan</code> defaults to using a full-information Maximum-Likelihood (ML) Estimator. This is the most efficient estimator available and can handle missing data.</p>
+<p><code>lavaan</code> defaults to using a full-information Maximum-Likelihood (ML) Estimator. This is the most efficient estimator available and can handle missing data (<code>missing=ml</code>).</p>
 
 <p>We may want to specify alternate estimators if our data do not meet the assumptions for ML.</p>
 
@@ -1594,6 +1637,8 @@ wheaton.cov &lt;-
 
 fit &lt;- sem(wheaton.model, sample.cov = wheaton.cov, sample.nobs = 932)
 </code></pre>
+
+<p>Note the model itself is not shown above.</p>
 
 </div>
 
